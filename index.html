@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>銀龍會 — 비밀 귀족 사회</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ─── 인증 화면 ─── -->
+  <div id="auth-screen" class="screen active">
+    <div class="auth-bg"></div>
+    <div class="auth-container">
+      <div class="auth-logo">
+        <div class="logo-symbol">銀龍</div>
+        <div class="logo-sub">은룡회 — 비밀 귀족 사회</div>
+      </div>
+
+      <!-- 최초 설정 -->
+      <div id="setup-form" class="auth-form hidden">
+        <h2>초기 설정</h2>
+        <p class="auth-subtitle">OpenAI API 키를 암호화하여 안전하게 저장합니다</p>
+        <div class="form-group">
+          <label>OpenAI API 키</label>
+          <input type="password" id="setup-api-key" placeholder="sk-...">
+        </div>
+        <div class="form-group">
+          <label>암호 설정</label>
+          <input type="password" id="setup-password" placeholder="암호 입력 (4자 이상)">
+        </div>
+        <div class="form-group">
+          <label>암호 확인</label>
+          <input type="password" id="setup-password-confirm" placeholder="암호 재입력">
+        </div>
+        <button id="setup-btn" class="btn-primary">설정 완료 및 시작</button>
+        <p id="setup-error" class="error-msg hidden"></p>
+      </div>
+
+      <!-- 로그인 -->
+      <div id="login-form" class="auth-form hidden">
+        <h2>입장</h2>
+        <p class="auth-subtitle">은룡회의 문이 당신을 기다립니다</p>
+        <div class="form-group">
+          <label>암호</label>
+          <input type="password" id="login-password" placeholder="암호를 입력하세요" autofocus>
+        </div>
+        <button id="login-btn" class="btn-primary">입장</button>
+        <p id="login-error" class="error-msg hidden"></p>
+        <button id="reset-btn" class="btn-ghost">API 키 초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 캐릭터 선택 화면 ─── -->
+  <div id="char-screen" class="screen hidden">
+    <div class="char-bg"></div>
+    <div class="char-container">
+      <h1 class="char-title">당신은 누구입니까?</h1>
+      <p class="char-subtitle">은룡회와의 첫 만남 — 당신의 정체를 선택하세요</p>
+
+      <div class="char-cards">
+        <div class="char-card" data-char="newcomer">
+          <div class="char-card-glow"></div>
+          <div class="char-icon">🎭</div>
+          <h3>야망의 신입</h3>
+          <p>평범한 집안에서 태어났지만 탁월한 재능으로 은룡회의 눈에 띄었습니다. 모든 것을 가질 기회가 왔습니다.</p>
+          <div class="char-stats">
+            <div class="mini-stat"><span>매력</span><div class="mini-bar"><div style="width:70%"></div></div></div>
+            <div class="mini-stat"><span>지략</span><div class="mini-bar"><div style="width:60%"></div></div></div>
+            <div class="mini-stat"><span>재력</span><div class="mini-bar"><div style="width:30%"></div></div></div>
+            <div class="mini-stat"><span>명성</span><div class="mini-bar"><div style="width:20%"></div></div></div>
+          </div>
+        </div>
+
+        <div class="char-card" data-char="noble">
+          <div class="char-card-glow"></div>
+          <div class="char-icon">👑</div>
+          <h3>은룡회 후계자</h3>
+          <p>은룡회 명문가의 자손으로 태어났습니다. 그러나 가문 내 음모가 당신을 위협하고 있습니다.</p>
+          <div class="char-stats">
+            <div class="mini-stat"><span>매력</span><div class="mini-bar"><div style="width:50%"></div></div></div>
+            <div class="mini-stat"><span>지략</span><div class="mini-bar"><div style="width:70%"></div></div></div>
+            <div class="mini-stat"><span>재력</span><div class="mini-bar"><div style="width:80%"></div></div></div>
+            <div class="mini-stat"><span>명성</span><div class="mini-bar"><div style="width:60%"></div></div></div>
+          </div>
+        </div>
+
+        <div class="char-card" data-char="investigator">
+          <div class="char-card-glow"></div>
+          <div class="char-icon">🔍</div>
+          <h3>진실의 추적자</h3>
+          <p>탐사 기자 또는 사설 탐정으로 은룡회를 조사하다 너무 깊이 들어왔습니다. 이제 돌아갈 수 없습니다.</p>
+          <div class="char-stats">
+            <div class="mini-stat"><span>매력</span><div class="mini-bar"><div style="width:50%"></div></div></div>
+            <div class="mini-stat"><span>지략</span><div class="mini-bar"><div style="width:90%"></div></div></div>
+            <div class="mini-stat"><span>재력</span><div class="mini-bar"><div style="width:40%"></div></div></div>
+            <div class="mini-stat"><span>명성</span><div class="mini-bar"><div style="width:10%"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <p class="char-hint">카드를 클릭하여 선택하세요</p>
+    </div>
+  </div>
+
+  <!-- ─── 메인 게임 화면 ─── -->
+  <div id="game-screen" class="screen hidden">
+
+    <!-- 헤더 (스탯 바) -->
+    <div class="game-header">
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-label">매력</span>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar charm" id="stat-charm"></div>
+          </div>
+          <span class="stat-val" id="stat-charm-val">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">지략</span>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar wit" id="stat-wit"></div>
+          </div>
+          <span class="stat-val" id="stat-wit-val">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">재력</span>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar wealth" id="stat-wealth"></div>
+          </div>
+          <span class="stat-val" id="stat-wealth-val">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">명성</span>
+          <div class="stat-bar-wrap">
+            <div class="stat-bar rep" id="stat-rep"></div>
+          </div>
+          <span class="stat-val" id="stat-rep-val">0</span>
+        </div>
+      </div>
+      <button id="relationship-btn" class="btn-icon" title="관계도">👥</button>
+    </div>
+
+    <!-- 스토리 영역 -->
+    <div class="story-container bg-default">
+      <div class="scene-title" id="scene-title"></div>
+      <div class="story-text" id="story-text"></div>
+    </div>
+
+    <!-- 선택지 영역 -->
+    <div class="choices-container" id="choices-container"></div>
+
+    <!-- 자유 입력 영역 -->
+    <div class="input-container hidden" id="input-container">
+      <textarea id="player-input" placeholder="어떻게 하시겠습니까? (Ctrl+Enter로 제출)" rows="3"></textarea>
+      <button id="submit-input" class="btn-primary">전송</button>
+    </div>
+  </div>
+
+  <!-- ─── AI 채팅 모달 ─── -->
+  <div id="chat-modal" class="modal hidden">
+    <div class="modal-content chat-modal-content">
+      <div class="modal-header">
+        <div class="npc-info">
+          <span class="npc-avatar" id="chat-npc-avatar"></span>
+          <div>
+            <h3 id="chat-npc-name"></h3>
+            <p id="chat-npc-title"></p>
+          </div>
+        </div>
+        <button id="close-chat" class="btn-close">✕</button>
+      </div>
+      <div class="chat-messages" id="chat-messages"></div>
+      <div class="chat-footer">
+        <div class="chat-input-area">
+          <input type="text" id="chat-input" placeholder="말을 건네세요... (Enter로 전송)">
+          <button id="chat-send" class="btn-primary">전송</button>
+        </div>
+        <button id="end-chat" class="btn-ghost">대화 종료</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 관계도 모달 ─── -->
+  <div id="relationship-modal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>관계도</h3>
+        <button id="close-relationship" class="btn-close">✕</button>
+      </div>
+      <div id="relationship-content" class="relationship-list"></div>
+    </div>
+  </div>
+
+  <!-- ─── 알림 ─── -->
+  <div id="notification" class="notification"></div>
+
+  <script src="js/crypto.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/story.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -141,11 +141,10 @@ def analyze_with_claude(m7_news: list[dict], watch: dict) -> str:
     return response.content[0].text
 
 
-def send_telegram(token: str, chat_id: str, text: str) -> None:
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    # Telegram limit: 4096 chars per message
-    for chunk in [text[i:i + 4000] for i in range(0, len(text), 4000)]:
-        resp = requests.post(url, json={"chat_id": chat_id, "text": chunk, "parse_mode": "Markdown"}, timeout=10)
+def send_discord(webhook_url: str, text: str) -> None:
+    # Discord limit: 2000 chars per message
+    for chunk in [text[i:i + 2000] for i in range(0, len(text), 2000)]:
+        resp = requests.post(webhook_url, json={"content": chunk}, timeout=10)
         resp.raise_for_status()
 
 
@@ -188,14 +187,13 @@ def main() -> None:
     subject = f"[주식알림] {today} M7 실적 + 관심종목 매매전략"
     full_text = f"*{subject}*\n\n{analysis}"
 
-    method = os.environ.get("NOTIFICATION_METHOD", "telegram")
-    if method == "telegram":
-        send_telegram(
-            token=os.environ["TELEGRAM_BOT_TOKEN"],
-            chat_id=os.environ["TELEGRAM_CHAT_ID"],
+    method = os.environ.get("NOTIFICATION_METHOD", "discord")
+    if method == "discord":
+        send_discord(
+            webhook_url=os.environ["DISCORD_WEBHOOK_URL"],
             text=full_text,
         )
-        print("  Telegram 알림 전송 완료")
+        print("  Discord 알림 전송 완료")
     elif method == "email":
         send_email(subject, analysis, os.environ["EMAIL_TO"])
         print("  이메일 알림 전송 완료")

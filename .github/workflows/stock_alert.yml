@@ -1,0 +1,31 @@
+name: Stock Earnings Alert (7AM KST)
+
+on:
+  schedule:
+    # 22:00 UTC = 07:00 KST (다음날)  —  평일만 실행
+    - cron: "0 22 * * 1-5"
+  workflow_dispatch:   # 수동 즉시 실행 버튼
+
+jobs:
+  send-alert:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r stock_alert/requirements.txt
+
+      - name: Run earnings alert
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          NOTIFICATION_METHOD: ${{ vars.NOTIFICATION_METHOD || 'telegram' }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+        run: python stock_alert/earnings_alert.py

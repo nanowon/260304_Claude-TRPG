@@ -2,7 +2,7 @@
 """
 Stock Earnings Alert System
 - Monitors M7 earnings announcements
-- Analyzes buy/sell opportunities for watchlist stocks (CEG, P, XE)
+- Analyzes buy/sell opportunities for watchlist stocks (CEG, P, XE, META, AMZN, MU)
 - Sends Telegram or email notification
 """
 
@@ -15,7 +15,7 @@ from datetime import datetime
 import pytz
 
 M7_TICKERS = ["AAPL", "MSFT", "GOOGL", "AMZN", "NVDA", "META", "TSLA"]
-WATCH_TICKERS = ["CEG", "P", "XE"]
+WATCH_TICKERS = ["CEG", "P", "XE", "META", "AMZN", "MU"]
 KST = pytz.timezone("Asia/Seoul")
 
 EARNINGS_KEYWORDS = [
@@ -119,7 +119,7 @@ def build_analysis_prompt(m7_news: list[dict], watch: dict) -> str:
 오늘/내일 시장 전반에 미칠 영향 예측 (위험선호 vs 위험회피 방향 포함).
 
 ### 🎯 관심 종목 매매 전략
-각 종목(CEG, P, XE)별로:
+각 종목(CEG, P, XE, META, AMZN, MU)별로:
 - **포지션 판단**: 매수 / 관망 / 매도
 - **단기차익 타겟가** (3-7% 목표, 진입 기준 명시)
 - **저점매수 포인트** (지지선 기준 가격대)
@@ -185,7 +185,7 @@ def main() -> None:
     analysis = analyze_with_claude(m7_news, watch)
 
     today = datetime.now(KST).strftime("%m/%d")
-    subject = f"[주식알림] {today} M7 실적 + CEG/P/XE 전략"
+    subject = f"[주식알림] {today} M7 실적 + 관심종목 매매전략"
     full_text = f"*{subject}*\n\n{analysis}"
 
     method = os.environ.get("NOTIFICATION_METHOD", "telegram")

@@ -223,7 +223,8 @@ def main():
                         help="Post-announcement checklist")
     args = parser.parse_args()
 
-    print_header(TICKER, 143.0 if args.demo else 0.0, EARNINGS_DATE)
+    from src.demo_data import MU_DEMO as _MU_DEMO
+    print_header(TICKER, _MU_DEMO["price"] if args.demo else 0.0, EARNINGS_DATE)
 
     if args.post:
         print_post_announcement_checklist()
